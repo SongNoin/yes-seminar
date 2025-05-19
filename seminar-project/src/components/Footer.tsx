@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -8,7 +9,7 @@ const Footer = () => {
     <FooterContainer>
       <FooterContent>
         <LogoSection>
-          <Logo>GameZone</Logo>
+          <Logo>경환랜드</Logo>
           <LogoText>최고의 게임 경험을 제공합니다</LogoText>
         </LogoSection>
         
@@ -16,30 +17,30 @@ const Footer = () => {
           <LinkSection>
             <LinkTitle>바로가기</LinkTitle>
             <LinkList>
-              <LinkItem
+              <LinkItemNav to="/"
                 whileHover={{ x: 5, color: 'var(--accent-color)' }}
                 transition={{ duration: 0.2 }}
               >
                 홈
-              </LinkItem>
-              <LinkItem
+              </LinkItemNav>
+              <LinkItemNav to="/games"
                 whileHover={{ x: 5, color: 'var(--accent-color)' }}
                 transition={{ duration: 0.2 }}
               >
                 게임
-              </LinkItem>
-              <LinkItem
+              </LinkItemNav>
+              <LinkItemNav to="/studios"
                 whileHover={{ x: 5, color: 'var(--accent-color)' }}
                 transition={{ duration: 0.2 }}
               >
-                랭킹
-              </LinkItem>
-              <LinkItem
+                스튜디오
+              </LinkItemNav>
+              <LinkItemNav to="/about"
                 whileHover={{ x: 5, color: 'var(--accent-color)' }}
                 transition={{ duration: 0.2 }}
               >
                 소개
-              </LinkItem>
+              </LinkItemNav>
             </LinkList>
           </LinkSection>
           
@@ -56,19 +57,19 @@ const Footer = () => {
                 whileHover={{ x: 5, color: 'var(--accent-color)' }}
                 transition={{ duration: 0.2 }}
               >
-                아케이드
+                배틀로얄
               </LinkItem>
               <LinkItem
                 whileHover={{ x: 5, color: 'var(--accent-color)' }}
                 transition={{ duration: 0.2 }}
               >
-                전략
+                시뮬레이션
               </LinkItem>
               <LinkItem
                 whileHover={{ x: 5, color: 'var(--accent-color)' }}
                 transition={{ duration: 0.2 }}
               >
-                액션
+                서바이벌 호러
               </LinkItem>
             </LinkList>
           </LinkSection>
@@ -108,7 +109,7 @@ const Footer = () => {
       <Divider />
       
       <BottomFooter>
-        <Copyright>© {currentYear} GameZone. All rights reserved.</Copyright>
+        <Copyright>© {currentYear} 경환랜드. All rights reserved.</Copyright>
         <SocialLinks>
           <SocialIcon
             whileHover={{ y: -5, color: 'var(--accent-color)' }}
@@ -229,6 +230,29 @@ const LinkItem = styled(motion.li)`
   }
 `;
 
+const LinkItemNav = styled(motion(Link))`
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  
+  &::before {
+    content: '>';
+    margin-right: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+    transform: translateX(5px);
+  }
+`;
+
 const Divider = styled.hr`
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -253,17 +277,17 @@ const BottomFooter = styled.div`
 
 const Copyright = styled.p`
   font-size: 0.9rem;
-  color: #777;
+  color: #aaa;
 `;
 
 const SocialLinks = styled.div`
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
 `;
 
 const SocialIcon = styled(motion.a)`
-  color: #aaa;
   font-size: 1.5rem;
+  color: #aaa;
   cursor: pointer;
   transition: color 0.3s ease;
 `;

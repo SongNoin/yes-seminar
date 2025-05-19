@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,33 +16,43 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const menuItems = [
+    { name: '홈', path: '/' },
+    { name: '게임', path: '/games' },
+    { name: '스튜디오', path: '/studios' },
+    { name: '소개', path: '/about' }
+  ];
+
   return (
     <HeaderContainer
       animate={{ backgroundColor: isScrolled ? 'rgba(10, 10, 10, 0.9)' : 'transparent' }}
       transition={{ duration: 0.3 }}
     >
       <LogoContainer>
-        <Logo
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          whileHover={{ scale: 1.05 }}
-        >
-          GameZone
-        </Logo>
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <Logo
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+          >
+            경환랜드
+          </Logo>
+        </Link>
       </LogoContainer>
       
       <NavLinks>
-        {['홈', '게임', '랭킹', '소개'].map((item, index) => (
-          <NavItem
-            key={item}
+        {menuItems.map((item, index) => (
+          <NavItemLink 
+            to={item.path}
+            key={item.name}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
             whileHover={{ scale: 1.1, color: 'var(--accent-color)' }}
           >
-            {item}
-          </NavItem>
+            {item.name}
+          </NavItemLink>
         ))}
       </NavLinks>
       
@@ -70,16 +81,18 @@ const Header = () => {
             >
               ×
             </CloseButton>
-            {['홈', '게임', '랭킹', '소개'].map((item, index) => (
-              <MobileNavItem
-                key={item}
+            {menuItems.map((item, index) => (
+              <MobileNavItemLink
+                to={item.path}
+                key={item.name}
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.05, x: 10, color: 'var(--accent-color)' }}
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                {item}
-              </MobileNavItem>
+                {item.name}
+              </MobileNavItemLink>
             ))}
           </MobileMenu>
         )}
@@ -93,13 +106,14 @@ const HeaderContainer = styled(motion.header)`
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 5%;
   transition: all 0.3s ease;
   backdrop-filter: blur(8px);
+  background-color: rgba(10, 10, 10, 0.8);
 `;
 
 const LogoContainer = styled.div`
@@ -124,11 +138,13 @@ const NavLinks = styled.nav`
   }
 `;
 
-const NavItem = styled(motion.a)`
+const NavItemLink = styled(motion(Link))`
   font-size: 1.1rem;
   font-weight: 500;
   cursor: pointer;
   position: relative;
+  text-decoration: none;
+  color: var(--text-color);
   
   &::after {
     content: '';
@@ -183,11 +199,13 @@ const MobileMenu = styled(motion.div)`
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
 `;
 
-const MobileNavItem = styled(motion.a)`
+const MobileNavItemLink = styled(motion(Link))`
   font-size: 1.5rem;
   font-weight: 500;
   margin: 1rem 0;
   cursor: pointer;
+  text-decoration: none;
+  color: var(--text-color);
 `;
 
 const CloseButton = styled(motion.button)`

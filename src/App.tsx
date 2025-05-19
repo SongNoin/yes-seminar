@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import GlobalStyles from './styles/GlobalStyles'
-import HomePage from './pages/HomePage'
-import MontyHallGame from './pages/MontyHallGame'
+import GlobalStyles from './seminar-project/src/styles/GlobalStyles'
+import HomePage from './seminar-project/src/pages/HomePage'
+import GamesPage from './seminar-project/src/pages/GamesPage'
+import StudiosPage from './seminar-project/src/pages/StudiosPage'
+import AboutPage from './seminar-project/src/pages/AboutPage'
+import MontyHallGame from './seminar-project/src/pages/MontyHallGame'
 import './App.css'
 
 function App() {
@@ -29,6 +32,9 @@ function App() {
       <GlobalStyles />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/games" element={<GamesPage />} />
+        <Route path="/studios" element={<StudiosPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/games/monty-hall" element={<MontyHallGame />} />
       </Routes>
     </Router>
