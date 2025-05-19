@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import type { Game, GameCategory } from '../types';
@@ -84,11 +84,16 @@ const GameGrid = () => {
   const [visibleGames, setVisibleGames] = useState<Game[]>(mockGames);
   
   useEffect(() => {
+    console.log('게임 목록:', games);
+    console.log('현재 카테고리:', activeCategory);
+    
     if (activeCategory === 'all') {
       setVisibleGames(games);
     } else {
       setVisibleGames(games.filter(game => game.category === activeCategory));
     }
+    
+    console.log('표시되는 게임:', visibleGames);
   }, [activeCategory, games]);
   
   const categoryLabels: Record<GameCategory | 'all', string> = {

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import GlobalStyles from './styles/GlobalStyles'
 import HomePage from './pages/HomePage'
@@ -35,4 +35,4 @@ function App() {
   )
 }
 
-export default App
+export default App 
