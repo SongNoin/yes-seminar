@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
@@ -14,6 +14,13 @@ enum GameState {
   RESULT = 'result',
 }
 
+enum AutoPlayMode {
+  OFF = 'off',
+  SWITCH = 'switch',
+  STAY = 'stay',
+  RANDOM = 'random',
+}
+
 const MontyHallGame = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.START);
   const [doors, setDoors] = useState<number[]>([]);
@@ -25,7 +32,13 @@ const MontyHallGame = () => {
   const [gamesPlayed, setGamesPlayed] = useState<number>(0);
   const [switchWins, setSwitchWins] = useState<number>(0);
   const [stayWins, setStayWins] = useState<number>(0);
+  const [switchAttempts, setSwitchAttempts] = useState<number>(0);
+  const [stayAttempts, setStayAttempts] = useState<number>(0);
   const [didSwitch, setDidSwitch] = useState<boolean | null>(null);
+  const [autoPlayMode, setAutoPlayMode] = useState<AutoPlayMode>(AutoPlayMode.OFF);
+  const [autoPlaySpeed, setAutoPlaySpeed] = useState<number>(1000);
+  
+  const autoPlayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 게임 초기화
   const startNewGame = () => {
@@ -40,6 +53,14 @@ const MontyHallGame = () => {
     setIsWinner(false);
     setDidSwitch(null);
     setGameState(GameState.FIRST_CHOICE);
+    
+    // 자동 실행 모드가 켜져 있다면 자동으로 문 선택
+    if (autoPlayMode !== AutoPlayMode.OFF) {
+      autoPlayRef.current = setTimeout(() => {
+        const randomDoor = Math.floor(Math.random() * TOTAL_DOORS);
+        handleFirstChoice(randomDoor);
+      }, autoPlaySpeed);
+    }
   };
 
   // 첫 번째 선택 처리
@@ -54,6 +75,29 @@ const MontyHallGame = () => {
     const doorToReveal = availableDoors[Math.floor(Math.random() * availableDoors.length)];
     setRevealedDoor(doorToReveal);
     setGameState(GameState.REVEAL);
+    
+    // 자동 실행 모드일 경우 다음 단계 자동 실행
+    if (autoPlayMode !== AutoPlayMode.OFF) {
+      autoPlayRef.current = setTimeout(() => {
+        let choice: 'switch' | 'stay';
+        
+        switch (autoPlayMode) {
+          case AutoPlayMode.SWITCH:
+            choice = 'switch';
+            break;
+          case AutoPlayMode.STAY:
+            choice = 'stay';
+            break;
+          case AutoPlayMode.RANDOM:
+            choice = Math.random() > 0.5 ? 'switch' : 'stay';
+            break;
+          default:
+            choice = 'stay';
+        }
+        
+        handleFinalChoice(choice);
+      }, autoPlaySpeed);
+    }
   };
 
   // 최종 선택 처리
@@ -66,9 +110,11 @@ const MontyHallGame = () => {
         (door) => door !== selectedDoor && door !== revealedDoor
       ) || selectedDoor;
       setDidSwitch(true);
+      setSwitchAttempts(prev => prev + 1);
     } else {
       finalDoor = selectedDoor;
       setDidSwitch(false);
+      setStayAttempts(prev => prev + 1);
     }
     
     setFinalChoice(finalDoor);
@@ -86,6 +132,29 @@ const MontyHallGame = () => {
     }
     
     setGameState(GameState.RESULT);
+    
+    // 자동 실행 모드일 경우 잠시 결과를 보여준 후 새 게임 시작
+    if (autoPlayMode !== AutoPlayMode.OFF) {
+      autoPlayRef.current = setTimeout(() => {
+        startNewGame();
+      }, autoPlaySpeed);
+    }
+  };
+
+  // 자동 실행 모드 변경 처리
+  const handleAutoPlayChange = (mode: AutoPlayMode) => {
+    // 이전 타이머 제거
+    if (autoPlayRef.current) {
+      clearTimeout(autoPlayRef.current);
+      autoPlayRef.current = null;
+    }
+    
+    setAutoPlayMode(mode);
+    
+    // 새로운 모드가 OFF가 아니면 즉시 새 게임 시작
+    if (mode !== AutoPlayMode.OFF) {
+      startNewGame();
+    }
   };
 
   // 문 색상 결정
@@ -112,7 +181,7 @@ const MontyHallGame = () => {
 
   // 문 클릭 핸들러
   const handleDoorClick = (doorIndex: number) => {
-    if (gameState === GameState.FIRST_CHOICE) {
+    if (gameState === GameState.FIRST_CHOICE && autoPlayMode === AutoPlayMode.OFF) {
       handleFirstChoice(doorIndex);
     }
   };
@@ -125,17 +194,26 @@ const MontyHallGame = () => {
       case GameState.FIRST_CHOICE:
         return '문을 하나 선택하세요!';
       case GameState.REVEAL:
-        return `문 ${revealedDoor! + 1}번 뒤에는 아무것도 없습니다. 선택을 바꾸시겠습니까?`;
+        return `문 ${revealedDoor! + 1}번 뒤에는 염소가 있습니다. 선택을 바꾸시겠습니까?`;
       case GameState.RESULT:
         if (isWinner) {
-          return '축하합니다! 당신이 이겼습니다! 🎉';
+          return '축하합니다! 자동차를 획득했습니다! 🚗';
         } else {
-          return `아쉽습니다! 상금은 문 ${prizeDoor! + 1}번 뒤에 있었습니다. 😢`;
+          return `아쉽습니다! 자동차는 문 ${prizeDoor! + 1}번 뒤에 있었습니다. 🐐`;
         }
       default:
         return '';
     }
   };
+
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (autoPlayRef.current) {
+        clearTimeout(autoPlayRef.current);
+      }
+    };
+  }, []);
 
   // 게임 시작 시 초기화
   useEffect(() => {
@@ -148,8 +226,8 @@ const MontyHallGame = () => {
       <MainContent>
         <GameTitle>몬티홀 문제</GameTitle>
         <GameDescription>
-          세 개의 문 중 하나를 선택하세요. 한 문 뒤에는 상금이 있고, 나머지 두 문 뒤에는 아무것도 없습니다.
-          문을 선택하면, 진행자가 남은 두 문 중 상금이 없는 문 하나를 보여줍니다.
+          세 개의 문 중 하나를 선택하세요. 한 문 뒤에는 자동차가 있고, 나머지 두 문 뒤에는 염소가 있습니다.
+          문을 선택하면, 진행자가 남은 두 문 중 염소가 있는 문 하나를 보여줍니다.
           그런 다음 당신은 선택을 유지하거나 남은 다른 문으로 바꿀 수 있습니다.
           과연 선택을 바꾸는 것이 유리할까요?
         </GameDescription>
@@ -168,24 +246,36 @@ const MontyHallGame = () => {
                   }}
                   transition={{ duration: 0.5 }}
                   onClick={() => handleDoorClick(door)}
-                  $clickable={gameState === GameState.FIRST_CHOICE && selectedDoor === null}
+                  $clickable={gameState === GameState.FIRST_CHOICE && selectedDoor === null && autoPlayMode === AutoPlayMode.OFF}
+                  whileHover={gameState === GameState.FIRST_CHOICE && selectedDoor === null && autoPlayMode === AutoPlayMode.OFF ? { scale: 1.05, boxShadow: '0 0 15px rgba(123, 44, 191, 0.5)' } : {}}
                 >
                   <DoorNumber>{door + 1}</DoorNumber>
-                  <DoorContent visible={gameState === GameState.RESULT || door === revealedDoor}>
-                    {door === prizeDoor ? (
-                      <PrizeIcon>🏆</PrizeIcon>
-                    ) : (
-                      <EmptyIcon>❌</EmptyIcon>
-                    )}
-                  </DoorContent>
                 </Door>
+                <DoorRoomBg 
+                  visible={gameState === GameState.RESULT || door === revealedDoor}
+                />
+                <DoorContent 
+                  visible={gameState === GameState.RESULT || door === revealedDoor}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ 
+                    opacity: (gameState === GameState.RESULT || door === revealedDoor) ? 1 : 0,
+                    scale: (gameState === GameState.RESULT || door === revealedDoor) ? 1 : 0.8
+                  }}
+                  transition={{ delay: 0.2, duration: 0.4 }}
+                >
+                  {door === prizeDoor ? (
+                    <PrizeIcon>🚗</PrizeIcon>
+                  ) : (
+                    <GoatIcon>🐐</GoatIcon>
+                  )}
+                </DoorContent>
                 <DoorShadow />
               </DoorWrapper>
             ))}
           </AnimatePresence>
         </DoorsContainer>
 
-        {gameState === GameState.REVEAL && (
+        {gameState === GameState.REVEAL && autoPlayMode === AutoPlayMode.OFF && (
           <ButtonContainer>
             <ActionButton
               whileHover={{ scale: 1.05 }}
@@ -204,7 +294,7 @@ const MontyHallGame = () => {
           </ButtonContainer>
         )}
 
-        {gameState === GameState.RESULT && (
+        {gameState === GameState.RESULT && autoPlayMode === AutoPlayMode.OFF && (
           <ResultContainer>
             <ResultInfo>
               {didSwitch !== null && (
@@ -227,19 +317,125 @@ const MontyHallGame = () => {
           <StatTitle>통계</StatTitle>
           <StatItem>총 게임 수: {gamesPlayed}</StatItem>
           <StatItem>
-            바꿨을 때 승률: {gamesPlayed ? ((switchWins / (gamesPlayed - stayWins || 1)) * 100).toFixed(1) : 0}%
-            ({switchWins}승)
+            바꿨을 때 승률: {switchAttempts > 0 ? 
+              ((switchWins / switchAttempts) * 100).toFixed(1) : "0.0"}%
+            ({switchWins}/{switchAttempts})
           </StatItem>
           <StatItem>
-            유지했을 때 승률: {gamesPlayed ? ((stayWins / (gamesPlayed - switchWins || 1)) * 100).toFixed(1) : 0}%
-            ({stayWins}승)
+            유지했을 때 승률: {stayAttempts > 0 ? 
+              ((stayWins / stayAttempts) * 100).toFixed(1) : "0.0"}%
+            ({stayWins}/{stayAttempts})
           </StatItem>
         </StatisticsContainer>
+
+        <AutoPlayContainer>
+          <AutoPlayTitle>자동 실행 모드</AutoPlayTitle>
+          <AutoPlayButtonContainer>
+            <AutoPlayButton 
+              isActive={autoPlayMode === AutoPlayMode.OFF} 
+              onClick={() => handleAutoPlayChange(AutoPlayMode.OFF)}
+            >
+              수동
+            </AutoPlayButton>
+            <AutoPlayButton 
+              isActive={autoPlayMode === AutoPlayMode.STAY} 
+              onClick={() => handleAutoPlayChange(AutoPlayMode.STAY)}
+            >
+              항상 유지
+            </AutoPlayButton>
+            <AutoPlayButton 
+              isActive={autoPlayMode === AutoPlayMode.SWITCH} 
+              onClick={() => handleAutoPlayChange(AutoPlayMode.SWITCH)}
+            >
+              항상 바꾸기
+            </AutoPlayButton>
+            <AutoPlayButton 
+              isActive={autoPlayMode === AutoPlayMode.RANDOM} 
+              onClick={() => handleAutoPlayChange(AutoPlayMode.RANDOM)}
+            >
+              랜덤
+            </AutoPlayButton>
+          </AutoPlayButtonContainer>
+          <SpeedContainer>
+            <SpeedLabel>속도: </SpeedLabel>
+            <SpeedSelect 
+              value={autoPlaySpeed}
+              onChange={(e) => setAutoPlaySpeed(Number(e.target.value))}
+            >
+              <option value={2000}>느림</option>
+              <option value={1000}>보통</option>
+              <option value={500}>빠름</option>
+              <option value={200}>매우 빠름</option>
+            </SpeedSelect>
+          </SpeedContainer>
+        </AutoPlayContainer>
       </MainContent>
       <Footer />
     </PageContainer>
   );
 };
+
+const AutoPlayContainer = styled.div`
+  background-color: var(--card-bg-color);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const AutoPlayTitle = styled.h3`
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+`;
+
+const AutoPlayButtonContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+`;
+
+const AutoPlayButton = styled.button<{ isActive: boolean }>`
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  background-color: ${props => props.isActive ? 'var(--primary-color)' : 'transparent'};
+  color: ${props => props.isActive ? 'white' : 'var(--text-color)'};
+  border: 2px solid var(--primary-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: ${props => props.isActive ? 'bold' : 'normal'};
+  
+  &:hover {
+    background-color: ${props => props.isActive ? 'var(--primary-color)' : 'rgba(123, 44, 191, 0.2)'};
+  }
+`;
+
+const SpeedContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+`;
+
+const SpeedLabel = styled.label`
+  color: var(--text-color);
+`;
+
+const SpeedSelect = styled.select`
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
+  background-color: var(--card-bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--primary-color);
+  cursor: pointer;
+`;
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -310,6 +506,9 @@ const DoorsContainer = styled.div`
 const DoorWrapper = styled.div`
   position: relative;
   perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Door = styled(motion.div)<{ $clickable: boolean }>`
@@ -330,7 +529,6 @@ const Door = styled(motion.div)<{ $clickable: boolean }>`
   &:hover {
     ${(props) => props.$clickable && `
       border-color: var(--primary-color);
-      transform: scale(1.02);
     `}
   }
 
@@ -355,7 +553,20 @@ const DoorNumber = styled.span`
   }
 `;
 
-const DoorContent = styled.div<{ visible: boolean }>`
+const DoorRoomBg = styled.div<{ visible: boolean }>`
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 95%;
+  height: 95%;
+  background-color: #333;
+  border-radius: 6px;
+  opacity: ${props => props.visible ? 1 : 0};
+  transition: opacity 0.3s ease;
+  z-index: -2;
+`;
+
+const DoorContent = styled(motion.div)<{ visible: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
@@ -364,38 +575,60 @@ const DoorContent = styled.div<{ visible: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 4rem;
-  opacity: ${(props) => (props.visible ? 1 : 0)};
-  transition: opacity 0.3s ease;
+  pointer-events: none;
   z-index: -1;
 `;
 
 const PrizeIcon = styled.span`
-  font-size: 6rem;
-  animation: pulse 1.5s infinite alternate;
+  font-size: 5rem;
+  animation: carAnimation 2s infinite alternate;
+  display: block;
 
-  @keyframes pulse {
-    from {
-      transform: scale(1);
-      filter: drop-shadow(0 0 0px gold);
+  @keyframes carAnimation {
+    0% {
+      transform: translateX(-5px) scale(1);
+      filter: drop-shadow(0 0 5px #3498db);
     }
-    to {
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 20px gold);
+    50% {
+      transform: translateX(0px) scale(1.05);
+      filter: drop-shadow(0 0 15px #3498db);
+    }
+    100% {
+      transform: translateX(5px) scale(1);
+      filter: drop-shadow(0 0 5px #3498db);
     }
   }
 
+  @media (max-width: 768px) {
+    font-size: 3.5rem;
+  }
+
   @media (max-width: 576px) {
-    font-size: 4rem;
+    font-size: 2.5rem;
   }
 `;
 
-const EmptyIcon = styled.span`
-  font-size: 4rem;
-  color: #ff5555;
+const GoatIcon = styled.span`
+  font-size: 3.5rem;
+  color: #8a795d;
+  animation: goatAnimation 1.5s infinite alternate;
+  display: block;
+
+  @keyframes goatAnimation {
+    0% {
+      transform: rotate(-5deg);
+    }
+    100% {
+      transform: rotate(5deg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
 
   @media (max-width: 576px) {
-    font-size: 3rem;
+    font-size: 2rem;
   }
 `;
 
