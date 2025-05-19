@@ -1,33 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect } from 'react'
+import GlobalStyles from './styles/GlobalStyles'
+import HomePage from './pages/HomePage'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  // 폰트 로드
+  useEffect(() => {
+    const link = document.createElement('link')
+    link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap'
+    link.rel = 'stylesheet'
+    document.head.appendChild(link)
+    
+    const iconLink = document.createElement('link')
+    iconLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css'
+    iconLink.rel = 'stylesheet'
+    document.head.appendChild(iconLink)
+    
+    return () => {
+      document.head.removeChild(link)
+      document.head.removeChild(iconLink)
+    }
+  }, [])
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <GlobalStyles />
+      <HomePage />
     </>
   )
 }
