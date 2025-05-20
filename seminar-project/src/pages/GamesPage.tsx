@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 // 이미지 경로
 const gameHeroImage = '/images/games-hero.svg';
@@ -14,6 +14,7 @@ const darkDarkerImage = '/images/dark-darker.svg';
 const inzoiImage = '/images/inzoi.svg';
 const callistoImage = '/images/callisto.svg';
 const omokImage = '/images/omok.svg';
+const knightTourImage = '/images/knight-tour.svg';
 
 const GamesPage = () => {
   useEffect(() => {
@@ -45,6 +46,15 @@ const GamesPage = () => {
     },
     {
       id: 3,
+      title: '기사의 여행',
+      description: '체스의 기사 말을 이용하여 모든 칸을 정확히 한 번씩 방문하는 퍼즐 게임입니다.',
+      genre: '퍼즐',
+      platform: 'PC/모바일',
+      imageUrl: knightTourImage,
+      path: '/games/knight-tour'
+    },
+    {
+      id: 4,
       title: '배틀그라운드',
       description: '배틀로얄 장르의 대표적인 생존 슈팅 게임입니다.',
       genre: '배틀로얄',
@@ -53,7 +63,7 @@ const GamesPage = () => {
       path: '/games/battlegrounds'
     },
     {
-      id: 4,
+      id: 5,
       title: '뉴스테이트 모바일',
       description: '미래를 배경으로 한 모바일 배틀로얄 슈팅 게임입니다.',
       genre: '배틀로얄',
@@ -62,7 +72,7 @@ const GamesPage = () => {
       path: '/games/newstate'
     },
     {
-      id: 5,
+      id: 6, 
       title: '다크앤다커 모바일',
       description: '어둠 속에서 펼쳐지는 익스트랙션 장르의 게임입니다.',
       genre: '익스트랙션',
@@ -71,7 +81,7 @@ const GamesPage = () => {
       path: '/games/dark-and-darker'
     },
     {
-      id: 6, 
+      id: 7,
       title: '인조이',
       description: '라이프 시뮬레이션 게임으로 자신만의 세계를 구축합니다.',
       genre: '시뮬레이션',
@@ -80,7 +90,7 @@ const GamesPage = () => {
       path: '/games/inzoi'
     },
     {
-      id: 7,
+      id: 8,
       title: '칼리스토 프로토콜',
       description: '공포 분위기의 서바이벌 호러 어드벤처 게임입니다.',
       genre: '서바이벌 호러',
@@ -96,6 +106,8 @@ const GamesPage = () => {
   // 장르 필터 옵션
   const genres = ['전체', '배틀로얄', '퍼즐', '보드게임', '시뮬레이션', '서바이벌 호러', '익스트랙션'];
 
+  const navigate = useNavigate();
+
   // 필터링 처리
   useEffect(() => {
     let result = [...games];
@@ -110,6 +122,20 @@ const GamesPage = () => {
     
     setFilteredGames(result);
   }, [activeGenre, activePlatform, games]);
+
+  // 게임 페이지로 이동하는 함수 
+  const navigateToGame = (path: string, e?: React.MouseEvent) => {
+    // 이벤트가 있으면 전파 중지
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    
+    console.log('Navigating to:', path);
+    
+    // 네비게이션 즉시 실행
+    navigate(path);
+  };
 
   return (
     <PageContainer>
@@ -175,11 +201,20 @@ const GamesPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
+                onClick={() => navigateToGame(game.path)}
               >
                 <GameImageContainer>
                   <GameImage src={game.imageUrl} alt={game.title} />
                   <GameOverlay>
-                    <GameLink to={game.path}>자세히 보기</GameLink>
+                    <Link 
+                      to={game.path} 
+                      onClick={(e) => navigateToGame(game.path, e)}
+                      style={{ display: 'block', textDecoration: 'none' }}
+                    >
+                      <GameButton>
+                        자세히 보기
+                      </GameButton>
+                    </Link>
                   </GameOverlay>
                 </GameImageContainer>
                 <GameInfo>
@@ -318,6 +353,11 @@ const GameCard = styled(motion.div)`
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
 `;
 
 const GameImageContainer = styled.div`
@@ -356,14 +396,15 @@ const GameOverlay = styled.div`
   }
 `;
 
-const GameLink = styled(Link)`
+const GameButton = styled.button`
   padding: 0.8rem 1.5rem;
   background: var(--primary-color);
   color: white;
-  text-decoration: none;
+  border: none;
   border-radius: 50px;
   font-weight: 600;
   transition: all 0.3s ease;
+  cursor: pointer;
   
   &:hover {
     background: var(--accent-color);

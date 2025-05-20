@@ -10,6 +10,7 @@ import StudiosPage from './seminar-project/src/pages/StudiosPage';
 import AboutPage from './seminar-project/src/pages/AboutPage';
 import MontyHallGame from './seminar-project/src/pages/MontyHallGame';
 import OmokGamePage from './seminar-project/src/pages/OmokGamePage';
+import KnightTourPage from './seminar-project/src/pages/KnightTourPage';
 
 function App() {
   // 폰트 로드
@@ -40,6 +41,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/games/monty-hall" element={<MontyHallGame />} />
         <Route path="/games/omok" element={<OmokGamePage />} />
+        <Route path="/games/knight-tour" element={<KnightTourPage />} />
       </Routes>
     </Router>
   );
