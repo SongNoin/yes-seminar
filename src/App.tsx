@@ -1,31 +1,34 @@
-import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import GlobalStyles from './seminar-project/src/styles/GlobalStyles'
-import HomePage from './seminar-project/src/pages/HomePage'
-import GamesPage from './seminar-project/src/pages/GamesPage'
-import StudiosPage from './seminar-project/src/pages/StudiosPage'
-import AboutPage from './seminar-project/src/pages/AboutPage'
-import MontyHallGame from './seminar-project/src/pages/MontyHallGame'
-import './App.css'
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './App.css';
+
+// 경환랜드 앱 컴포넌트들 가져오기
+import GlobalStyles from './seminar-project/src/styles/GlobalStyles';
+import HomePage from './seminar-project/src/pages/HomePage';
+import GamesPage from './seminar-project/src/pages/GamesPage';
+import StudiosPage from './seminar-project/src/pages/StudiosPage';
+import AboutPage from './seminar-project/src/pages/AboutPage';
+import MontyHallGame from './seminar-project/src/pages/MontyHallGame';
+import OmokGamePage from './seminar-project/src/pages/OmokGamePage';
 
 function App() {
   // 폰트 로드
   useEffect(() => {
-    const link = document.createElement('link')
-    link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap'
-    link.rel = 'stylesheet'
-    document.head.appendChild(link)
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
     
-    const iconLink = document.createElement('link')
-    iconLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css'
-    iconLink.rel = 'stylesheet'
-    document.head.appendChild(iconLink)
+    const iconLink = document.createElement('link');
+    iconLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css';
+    iconLink.rel = 'stylesheet';
+    document.head.appendChild(iconLink);
     
     return () => {
-      document.head.removeChild(link)
-      document.head.removeChild(iconLink)
-    }
-  }, [])
+      document.head.removeChild(link);
+      document.head.removeChild(iconLink);
+    };
+  }, []);
 
   return (
     <Router>
@@ -36,9 +39,10 @@ function App() {
         <Route path="/studios" element={<StudiosPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/games/monty-hall" element={<MontyHallGame />} />
+        <Route path="/games/omok" element={<OmokGamePage />} />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App 
+export default App; 

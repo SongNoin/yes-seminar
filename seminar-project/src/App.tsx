@@ -6,6 +6,7 @@ import GamesPage from './pages/GamesPage'
 import StudiosPage from './pages/StudiosPage'
 import AboutPage from './pages/AboutPage'
 import MontyHallGame from './pages/MontyHallGame'
+import OmokGamePage from './pages/OmokGamePage'
 import './App.css'
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         <Route path="/studios" element={<StudiosPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/games/monty-hall" element={<MontyHallGame />} />
+        <Route path="/games/omok" element={<OmokGamePage />} />
       </Routes>
     </Router>
   )

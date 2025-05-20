@@ -13,6 +13,7 @@ const newstateImage = '/images/newstate.svg';
 const darkDarkerImage = '/images/dark-darker.svg';
 const inzoiImage = '/images/inzoi.svg';
 const callistoImage = '/images/callisto.svg';
+const omokImage = '/images/omok.svg';
 
 const GamesPage = () => {
   useEffect(() => {
@@ -35,6 +36,15 @@ const GamesPage = () => {
     },
     {
       id: 2,
+      title: '오목 게임',
+      description: '전통적인 오목 게임, 흑백 돌을 번갈아 놓으며 5개를 연속으로 놓으면 승리합니다.',
+      genre: '보드게임',
+      platform: 'PC/모바일',
+      imageUrl: omokImage,
+      path: '/games/omok'
+    },
+    {
+      id: 3,
       title: '배틀그라운드',
       description: '배틀로얄 장르의 대표적인 생존 슈팅 게임입니다.',
       genre: '배틀로얄',
@@ -43,7 +53,7 @@ const GamesPage = () => {
       path: '/games/battlegrounds'
     },
     {
-      id: 3,
+      id: 4,
       title: '뉴스테이트 모바일',
       description: '미래를 배경으로 한 모바일 배틀로얄 슈팅 게임입니다.',
       genre: '배틀로얄',
@@ -52,7 +62,7 @@ const GamesPage = () => {
       path: '/games/newstate'
     },
     {
-      id: 4,
+      id: 5,
       title: '다크앤다커 모바일',
       description: '어둠 속에서 펼쳐지는 익스트랙션 장르의 게임입니다.',
       genre: '익스트랙션',
@@ -61,7 +71,7 @@ const GamesPage = () => {
       path: '/games/dark-and-darker'
     },
     {
-      id: 5, 
+      id: 6, 
       title: '인조이',
       description: '라이프 시뮬레이션 게임으로 자신만의 세계를 구축합니다.',
       genre: '시뮬레이션',
@@ -70,7 +80,7 @@ const GamesPage = () => {
       path: '/games/inzoi'
     },
     {
-      id: 6,
+      id: 7,
       title: '칼리스토 프로토콜',
       description: '공포 분위기의 서바이벌 호러 어드벤처 게임입니다.',
       genre: '서바이벌 호러',
@@ -84,7 +94,7 @@ const GamesPage = () => {
   const platforms = ['전체', 'PC', '모바일', '콘솔'];
 
   // 장르 필터 옵션
-  const genres = ['전체', '배틀로얄', '퍼즐', '시뮬레이션', '서바이벌 호러', '익스트랙션'];
+  const genres = ['전체', '배틀로얄', '퍼즐', '보드게임', '시뮬레이션', '서바이벌 호러', '익스트랙션'];
 
   // 필터링 처리
   useEffect(() => {
