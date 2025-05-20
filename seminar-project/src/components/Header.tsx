@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,33 +18,63 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const menuItems = [
+    { name: '홈', path: '/' },
+    { name: '게임', path: '/games' },
+    { name: '스튜디오', path: '/studios' },
+    { name: '소개', path: '/about' }
+  ];
+
+  // 경로가 활성 상태인지 확인
+  const isPathActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  // 네비게이션 처리 함수
+  const handleNavigation = (path: string) => {
+    console.log('Header navigating to:', path);
+    navigate(path);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <HeaderContainer
       animate={{ backgroundColor: isScrolled ? 'rgba(10, 10, 10, 0.9)' : 'transparent' }}
       transition={{ duration: 0.3 }}
     >
       <LogoContainer>
-        <Logo
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          whileHover={{ scale: 1.05 }}
-        >
-          GameZone
-        </Logo>
+        <LogoLink onClick={() => handleNavigation('/')}>
+          <Logo
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+          >
+            경환랜드
+          </Logo>
+        </LogoLink>
       </LogoContainer>
       
       <NavLinks>
-        {['홈', '게임', '랭킹', '소개'].map((item, index) => (
-          <NavItem
-            key={item}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            whileHover={{ scale: 1.1, color: 'var(--accent-color)' }}
+        {menuItems.map((item, index) => (
+          <Link 
+            to={item.path} 
+            key={item.name} 
+            style={{ textDecoration: 'none' }}
           >
-            {item}
-          </NavItem>
+            <NavItemLink 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              whileHover={{ scale: 1.1, color: 'var(--accent-color)' }}
+              isActive={isPathActive(item.path)}
+            >
+              {item.name}
+            </NavItemLink>
+          </Link>
         ))}
       </NavLinks>
       
@@ -70,16 +103,23 @@ const Header = () => {
             >
               ×
             </CloseButton>
-            {['홈', '게임', '랭킹', '소개'].map((item, index) => (
-              <MobileNavItem
-                key={item}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05, x: 10, color: 'var(--accent-color)' }}
+            {menuItems.map((item, index) => (
+              <Link 
+                to={item.path}
+                key={item.name} 
+                style={{ textDecoration: 'none' }}
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                {item}
-              </MobileNavItem>
+                <MobileNavItemLink
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05, x: 10, color: 'var(--accent-color)' }}
+                  isActive={isPathActive(item.path)}
+                >
+                  {item.name}
+                </MobileNavItemLink>
+              </Link>
             ))}
           </MobileMenu>
         )}
@@ -93,13 +133,14 @@ const HeaderContainer = styled(motion.header)`
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 5%;
   transition: all 0.3s ease;
   backdrop-filter: blur(8px);
+  background-color: rgba(10, 10, 10, 0.8);
 `;
 
 const LogoContainer = styled.div`
@@ -107,12 +148,15 @@ const LogoContainer = styled.div`
 `;
 
 const Logo = styled(motion.h1)`
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: var(--neon-glow);
+  color: white;
+  margin: 0;
+  cursor: pointer;
+`;
+
+const LogoLink = styled.div`
+  cursor: pointer;
 `;
 
 const NavLinks = styled.nav`
@@ -124,21 +168,23 @@ const NavLinks = styled.nav`
   }
 `;
 
-const NavItem = styled(motion.a)`
+const NavItemLink = styled(motion.span)<{ isActive: boolean }>`
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: ${props => props.isActive ? '600' : '400'};
+  color: ${props => props.isActive ? 'var(--accent-color)' : 'white'};
   cursor: pointer;
+  padding: 0.5rem 0;
   position: relative;
   
   &::after {
     content: '';
     position: absolute;
-    bottom: -5px;
+    bottom: 0;
     left: 0;
-    width: 0;
+    width: ${props => props.isActive ? '100%' : '0'};
     height: 2px;
     background-color: var(--accent-color);
-    transition: width 0.3s ease;
+    transition: all 0.3s ease;
   }
   
   &:hover::after {
@@ -146,26 +192,43 @@ const NavItem = styled(motion.a)`
   }
 `;
 
-const MobileMenuButton = styled(motion.div)`
+const MobileMenuButton = styled(motion.button)`
   display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 30px;
-  height: 21px;
+  background: transparent;
+  border: none;
   cursor: pointer;
+  width: 30px;
+  height: 25px;
+  position: relative;
   z-index: 101;
   
   span {
     display: block;
+    position: absolute;
     height: 3px;
     width: 100%;
-    background-color: var(--text-color);
+    background: white;
     border-radius: 3px;
-    transition: all 0.3s ease;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
+    
+    &:nth-child(1) {
+      top: 0px;
+    }
+    
+    &:nth-child(2) {
+      top: 10px;
+    }
+    
+    &:nth-child(3) {
+      top: 20px;
+    }
   }
   
   @media (max-width: 768px) {
-    display: flex;
+    display: block;
   }
 `;
 
@@ -173,32 +236,35 @@ const MobileMenu = styled(motion.div)`
   position: fixed;
   top: 0;
   right: 0;
-  width: 70%;
+  width: 75%;
+  max-width: 300px;
   height: 100vh;
-  background-color: var(--background-color);
+  background: rgba(25, 25, 25, 0.95);
   z-index: 100;
+  padding: 5rem 2rem 2rem;
   display: flex;
   flex-direction: column;
-  padding: 5rem 2rem;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-`;
-
-const MobileNavItem = styled(motion.a)`
-  font-size: 1.5rem;
-  font-weight: 500;
-  margin: 1rem 0;
-  cursor: pointer;
+  gap: 2rem;
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
 `;
 
 const CloseButton = styled(motion.button)`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 2rem;
-  color: var(--text-color);
-  background: none;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
   border: none;
+  font-size: 2rem;
+  color: white;
   cursor: pointer;
 `;
 
-export default Header; 
+const MobileNavItemLink = styled(motion.span)<{ isActive: boolean }>`
+  font-size: 1.4rem;
+  font-weight: ${props => props.isActive ? '600' : '400'};
+  color: ${props => props.isActive ? 'var(--accent-color)' : 'white'};
+  padding: 0.5rem 0;
+  display: block;
+`;
+
+export default Header;

@@ -6,6 +6,17 @@ import GameCard from './GameCard';
 
 const mockGames: Game[] = [
   {
+    id: '7',
+    title: '몬티홀 문제',
+    description: '확률 이론의 유명한 문제를 게임으로 체험해보세요',
+    imageUrl: 'https://images.unsplash.com/photo-1553481187-be93c21490a9?q=80&w=1000',
+    path: '/games/monty-hall',
+    category: 'puzzle',
+    tags: ['퍼즐', '확률', '선택'],
+    isNew: true,
+    isFeatured: true
+  },
+  {
     id: '1',
     title: '블록 퍼즐',
     description: '다양한 모양의 블록을 맞춰 줄을 완성하는 퍼즐 게임',

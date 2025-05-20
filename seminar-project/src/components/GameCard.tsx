@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import type { Game } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 interface GameCardProps {
   game: Game;
@@ -8,12 +9,20 @@ interface GameCardProps {
 }
 
 const GameCard = ({ game, index }: GameCardProps) => {
+  const navigate = useNavigate();
+
+  const handlePlay = () => {
+    console.log(`게임 경로로 이동: ${game.path}`);
+    navigate(game.path);
+  };
+
   return (
     <CardContainer
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -10, boxShadow: '0 20px 30px rgba(0, 0, 0, 0.3)' }}
+      onClick={handlePlay}
     >
       <ImageContainer>
         <GameImage src={game.imageUrl} alt={game.title} />
@@ -35,6 +44,7 @@ const GameCard = ({ game, index }: GameCardProps) => {
       <PlayButton
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        onClick={handlePlay}
       >
         플레이하기
       </PlayButton>

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -56,14 +57,14 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            게임의 <GradientText>새로운 세계</GradientText>를 만나보세요
+            <GradientText>경환랜드</GradientText>에서 게임의 세계를 탐험하세요
           </Title>
           <Subtitle
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            다양한 재미있는 게임들을 한 곳에서 즐길 수 있습니다
+            혁신적인 게임 경험을 제공하는 경환랜드에 오신 것을 환영합니다
           </Subtitle>
           <ButtonGroup
             initial={{ opacity: 0, y: 50 }}
@@ -71,16 +72,20 @@ const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <PrimaryButton
+              as={Link}
+              to="/games"
               whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(123, 44, 191, 0.7)' }}
               whileTap={{ scale: 0.95 }}
             >
-              시작하기
+              게임 시작하기
             </PrimaryButton>
             <SecondaryButton
+              as={Link}
+              to="/about"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              게임 둘러보기
+              경환랜드 소개
             </SecondaryButton>
           </ButtonGroup>
         </TextContent>
@@ -197,6 +202,10 @@ const Button = styled(motion.button)`
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   
   @media (max-width: 576px) {
     width: 100%;
