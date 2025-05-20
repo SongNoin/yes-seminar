@@ -334,7 +334,6 @@ const OmokGamePage: React.FC = () => {
   const createSparkles = (row: number, col: number, isBlack: boolean) => {
     const newSparkles = [];
     const numSparkles = 12;
-    const baseColor = isBlack ? '#9d4edd' : '#ffdd00';
     
     // 오목 셀의 중앙 위치를 계산
     const cellX = col * 30 + 15; // 30px 셀 크기

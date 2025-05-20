@@ -79,16 +79,21 @@ const mockGames: Game[] = [
 const categories: GameCategory[] = ['all' as GameCategory, 'puzzle', 'arcade', 'strategy', 'action', 'card'];
 
 const GameGrid = () => {
-  const [games, setGames] = useState<Game[]>(mockGames);
+  const [games] = useState<Game[]>(mockGames);
   const [activeCategory, setActiveCategory] = useState<GameCategory | 'all'>('all');
   const [visibleGames, setVisibleGames] = useState<Game[]>(mockGames);
   
   useEffect(() => {
+    console.log('게임 목록:', games);
+    console.log('현재 카테고리:', activeCategory);
+    
     if (activeCategory === 'all') {
       setVisibleGames(games);
     } else {
       setVisibleGames(games.filter(game => game.category === activeCategory));
     }
+    
+    console.log('표시되는 게임:', visibleGames);
   }, [activeCategory, games]);
   
   const categoryLabels: Record<GameCategory | 'all', string> = {

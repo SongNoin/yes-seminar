@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
@@ -6,23 +6,27 @@ import Footer from '../components/Footer';
 
 const TOTAL_DOORS = 3;
 
-enum GameState {
-  START = 'start',
-  FIRST_CHOICE = 'first_choice',
-  REVEAL = 'reveal',
-  FINAL_CHOICE = 'final_choice',
-  RESULT = 'result',
-}
+const GameState = {
+  START: 'start',
+  FIRST_CHOICE: 'first_choice',
+  REVEAL: 'reveal',
+  FINAL_CHOICE: 'final_choice',
+  RESULT: 'result',
+} as const;
 
-enum AutoPlayMode {
-  OFF = 'off',
-  SWITCH = 'switch',
-  STAY = 'stay',
-  RANDOM = 'random',
-}
+type GameStateType = typeof GameState[keyof typeof GameState];
+
+const AutoPlayMode = {
+  OFF: 'off',
+  SWITCH: 'switch',
+  STAY: 'stay',
+  RANDOM: 'random',
+} as const;
+
+type AutoPlayModeType = typeof AutoPlayMode[keyof typeof AutoPlayMode];
 
 const MontyHallGame = () => {
-  const [gameState, setGameState] = useState<GameState>(GameState.START);
+  const [gameState, setGameState] = useState<GameStateType>(GameState.START);
   const [doors, setDoors] = useState<number[]>([]);
   const [prizeDoor, setPrizeDoor] = useState<number | null>(null);
   const [selectedDoor, setSelectedDoor] = useState<number | null>(null);
@@ -35,7 +39,7 @@ const MontyHallGame = () => {
   const [switchAttempts, setSwitchAttempts] = useState<number>(0);
   const [stayAttempts, setStayAttempts] = useState<number>(0);
   const [didSwitch, setDidSwitch] = useState<boolean | null>(null);
-  const [autoPlayMode, setAutoPlayMode] = useState<AutoPlayMode>(AutoPlayMode.OFF);
+  const [autoPlayMode, setAutoPlayMode] = useState<AutoPlayModeType>(AutoPlayMode.OFF);
   const [autoPlaySpeed, setAutoPlaySpeed] = useState<number>(1000);
   
   const autoPlayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -52,7 +56,7 @@ const MontyHallGame = () => {
     setFinalChoice(null);
     setIsWinner(false);
     setDidSwitch(null);
-    setGameState(GameState.FIRST_CHOICE);
+    setGameState(GameState.START);
     
     // 자동 실행 모드가 켜져 있다면 자동으로 문 선택
     if (autoPlayMode !== AutoPlayMode.OFF) {
@@ -142,7 +146,7 @@ const MontyHallGame = () => {
   };
 
   // 자동 실행 모드 변경 처리
-  const handleAutoPlayChange = (mode: AutoPlayMode) => {
+  const handleAutoPlayChange = (mode: AutoPlayModeType) => {
     // 이전 타이머 제거
     if (autoPlayRef.current) {
       clearTimeout(autoPlayRef.current);

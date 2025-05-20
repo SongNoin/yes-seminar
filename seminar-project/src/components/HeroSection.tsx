@@ -11,7 +11,7 @@ const HeroSection = () => {
   useEffect(() => {
     if (heroRef.current && textRef.current) {
       // 배경 파티클 효과
-      const particles = Array.from({ length: 20 }, (_, i) => {
+      const particles = Array.from({ length: 20 }, () => {
         const particle = document.createElement('div');
         particle.className = 'particle';
         particle.style.setProperty('--size', `${Math.random() * 30 + 10}px`);
