@@ -46,6 +46,12 @@ const MontyHallGame = () => {
 
   // 게임 초기화
   const startNewGame = () => {
+    // 이전 자동 실행 타이머 제거
+    if (autoPlayRef.current) {
+      clearTimeout(autoPlayRef.current);
+      autoPlayRef.current = null;
+    }
+
     const doors = Array.from({ length: TOTAL_DOORS }, (_, i) => i);
     const prize = Math.floor(Math.random() * TOTAL_DOORS);
 
@@ -56,7 +62,7 @@ const MontyHallGame = () => {
     setFinalChoice(null);
     setIsWinner(false);
     setDidSwitch(null);
-    setGameState(GameState.START);
+    setGameState(GameState.FIRST_CHOICE);
     
     // 자동 실행 모드가 켜져 있다면 자동으로 문 선택
     if (autoPlayMode !== AutoPlayMode.OFF) {
@@ -72,9 +78,14 @@ const MontyHallGame = () => {
     setSelectedDoor(doorIndex);
     
     // 보여줄 문 선택 (선택된 문도, 상금이 있는 문도 아닌 문 중 하나)
-    const availableDoors = doors.filter(
+    let availableDoors = doors.filter(
       (d) => d !== doorIndex && d !== prizeDoor
     );
+    
+    // 선택한 문과 상금 문이 같은 경우, 나머지 두 문 중 하나를 랜덤하게 선택
+    if (availableDoors.length === 0) {
+      availableDoors = doors.filter(d => d !== doorIndex);
+    }
     
     const doorToReveal = availableDoors[Math.floor(Math.random() * availableDoors.length)];
     setRevealedDoor(doorToReveal);
@@ -112,7 +123,14 @@ const MontyHallGame = () => {
       // 선택되지 않았고, 공개되지 않은 문으로 전환
       finalDoor = doors.find(
         (door) => door !== selectedDoor && door !== revealedDoor
-      ) || selectedDoor;
+      );
+      
+      // 만약 조건에 맞는 문을 찾지 못했다면 현재 선택된 문 유지
+      if (finalDoor === undefined) {
+        finalDoor = selectedDoor;
+        console.warn('Unable to find a valid door to switch to, keeping the selected door.');
+      }
+      
       setDidSwitch(true);
       setSwitchAttempts(prev => prev + 1);
     } else {
@@ -163,6 +181,11 @@ const MontyHallGame = () => {
 
   // 문 색상 결정
   const getDoorColor = (doorIndex: number) => {
+    // 선택된 문이 null인 경우 기본 색상 반환
+    if (selectedDoor === null) {
+      return 'var(--card-bg-color)';
+    }
+    
     if (gameState === GameState.RESULT) {
       if (doorIndex === prizeDoor) {
         return 'var(--accent-color)';
@@ -221,6 +244,8 @@ const MontyHallGame = () => {
 
   // 게임 시작 시 초기화
   useEffect(() => {
+    // 초기에 게임 상태를 FIRST_CHOICE로 설정하여 즉시 게임 시작
+    setGameState(GameState.FIRST_CHOICE);
     startNewGame();
   }, []);
 

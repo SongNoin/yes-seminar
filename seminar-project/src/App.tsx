@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
-import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import GlobalStyles from './styles/GlobalStyles'
 import HomePage from './pages/HomePage'
 import GamesPage from './pages/GamesPage'
@@ -71,11 +71,11 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Layout>
         <AppRoutes />
       </Layout>
-    </HashRouter>
+    </BrowserRouter>
   )
 }
 
